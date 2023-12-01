@@ -5,7 +5,7 @@ function AddContactModel({ isOpen, onClose, onAddContact }) {
   const [formData, setFormData] = useState({
     firstname: "",
     lastname: "",
-    mobile: 0,
+    mobile: "",
   });
 
   const handleAddContact = () => {

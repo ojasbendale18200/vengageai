@@ -19,19 +19,17 @@ export const fetchContacts = createAsyncThunk(
 export const addContact = createAsyncThunk(
   "contacts/addContact",
   async (contactData) => {
-    const response = await axios_create.post(
-      "/contact/addcontact",
-      contactData
-    );
-    return response.data;
+    const response = await axios_create.post("/addcontact", contactData);
+    return response.data.contact;
   }
 );
 
 export const modifyContact = createAsyncThunk(
   "contacts/modifyContact",
   async ({ id, contactData }) => {
-    const response = await axios_create.put(`/contact/${id}`, contactData);
-    return response.data;
+    console.log(id, contactData);
+    // const response = await axios_create.patch(`/contact/${id}`, contactData);
+    // console.log(response);
   }
 );
 

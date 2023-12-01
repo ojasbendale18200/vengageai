@@ -13,8 +13,8 @@ function SearchContact() {
   };
 
   const handleAddContact = (newContactData) => {
-    // dispatch(addContact(newContactData));
-    console.log(newContactData);
+    dispatch(addContact(newContactData));
+    dispatch(fetchContacts());
   };
   return (
     <div className="container mx-auto p-4">
@@ -29,7 +29,7 @@ function SearchContact() {
         />
 
         <button
-          className="  bg-blue-500 text-white p-2 rounded-full"
+          className="  bg-blue-500 text-white p-2 rounded-full ml-2"
           onClick={() => setAddContactModalOpen(true)}
         >
           +
