@@ -44,7 +44,7 @@ const contactSlice = createSlice({
       })
 
       .addCase(addContact.fulfilled, (state, action) => {
-        state.data = [...state.data, action.payload];
+        state.data = [action.payload, ...state.data];
       })
       .addCase(modifyContact.fulfilled, (state, action) => {
         state.data = state.data.map((contact) =>
