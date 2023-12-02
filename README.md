@@ -36,7 +36,7 @@ Date and Time Selection
 This interface allows you to choose a date and time as per availability.
 
 ## Deployed link
-- https://vercel.com/ojasbendale18200/vengageai-es1e
+- https://vengageai-es1e.vercel.app/
 
 ## Tech Stack and library
 - HTML
