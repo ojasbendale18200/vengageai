@@ -2,191 +2,105 @@ import React, { useEffect, useState } from "react";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 
+import { mon, sat, wed } from "../utils/data";
+import { useToast } from "@chakra-ui/react";
+
+const renderTimeSlot = (el, onClick) => (
+  <div
+    key={el.time}
+    onClick={onClick}
+    className={`w-full p-2 text-center rounded ${
+      !el.status
+        ? "bg-gray-300 text-black-700 cursor-not-allowed"
+        : "bg-blue-500 text-white cursor-pointer"
+    }`}
+  >
+    {el.time}
+  </div>
+);
+
 function BookSlots() {
-  const generateTimeSlots = (date, startHour, endHour, unavailableRanges) => {
-    const timeSlots = [];
-
-    for (let i = startHour; i < endHour; i++) {
-      const slotTime = new Date(date);
-      slotTime.setHours(i, 0, 0);
-      const isUnavailable = checkUnavailable(slotTime, unavailableRanges);
-      timeSlots.push({ time: slotTime, isUnavailable });
-    }
-
-    return timeSlots;
-  };
-
-  const checkUnavailable = (time, unavailableRanges) => {
-    for (const [start, end] of unavailableRanges) {
-      if (time >= start && time < end) {
-        return true;
-      }
-    }
-    return false;
-  };
-
-  const dayDetails = {
-    Monday: {
-      startHour: 8,
-      endHour: 17,
-      unavailableRanges: [
-        [12, 30],
-        [13, 0],
-      ],
-    },
-    Tuesday: {
-      startHour: 8,
-      endHour: 17,
-      unavailableRanges: [
-        [12, 30],
-        [13, 0],
-      ],
-    },
-    Wednesday: {
-      startHour: 8,
-      endHour: 17,
-      unavailableRanges: [
-        [12, 30],
-        [13, 0],
-        [15, 30],
-        [16, 30],
-      ],
-    },
-    Thursday: {
-      startHour: 8,
-      endHour: 17,
-      unavailableRanges: [
-        [12, 30],
-        [13, 0],
-      ],
-    },
-    Friday: {
-      startHour: 8,
-      endHour: 17,
-      unavailableRanges: [
-        [12, 30],
-        [13, 0],
-      ],
-    },
-    Saturday: { startHour: 8, endHour: 12, unavailableRanges: [] },
-    Sunday: { startHour: 0, endHour: 0, unavailableRanges: [] }, // Holiday
-  };
-
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [selectedTime, setSelectedTime] = useState(null);
-  const [bookedSlots, setBookedSlots] = useState([]);
-
+  const [value, onChange] = useState(new Date());
+  const [day, setday] = useState("mon");
+  const toast = useToast();
   useEffect(() => {
-    const bookedSlotsData = [
-      new Date(new Date().setHours(11, 0, 0)),
-      new Date(new Date().setHours(14, 0, 0)),
-    ];
-    setBookedSlots(bookedSlotsData);
-  }, []);
-
-  const dayDetail =
-    dayDetails[selectedDate.toLocaleDateString("en-US", { weekday: "long" })];
-
-  const timeSlots = dayDetail
-    ? generateTimeSlots(
-        selectedDate,
-        dayDetail.startHour,
-        dayDetail.endHour,
-        dayDetail.unavailableRanges
-      )
-    : [];
-
-  const handleDateChange = (date) => {
-    setSelectedDate(date);
-    setSelectedTime(null);
+    setday(value.toDateString().split(" ")[0]);
+  }, [value]);
+  const booked = () => {
+    toast({
+      title: "Available",
+      description: "This Time Slot Is Available.",
+      status: "success",
+      duration: 2000,
+      position: "top",
+      isClosable: true,
+    });
   };
 
-  const handleTimeClick = (time) => {
-    setSelectedTime(time);
+  const notBooked = () => {
+    toast({
+      title: "Closed",
+      description: "This Time Slot Is Not Available.",
+      status: "warning",
+      duration: 2000,
+      position: "top",
+      isClosable: true,
+    });
+  };
+
+  const renderDayContent = () => {
+    switch (day) {
+      case "Mon":
+      case "Tue":
+      case "Thu":
+      case "Fri":
+        return mon.map((el) =>
+          renderTimeSlot(el, () => (!el.status ? notBooked() : booked()))
+        );
+      case "Wed":
+        return wed.map((el) =>
+          renderTimeSlot(el, () => (!el.status ? notBooked() : booked()))
+        );
+      case "Sat":
+        return sat.map((el) =>
+          renderTimeSlot(el, () => (!el.status ? notBooked() : booked()))
+        );
+      case "Sun":
+        return <div className="text-red-500 text-lg"> holiday!</div>;
+      default:
+        return null;
+    }
   };
 
   return (
     <>
-      <h1 className="mb-8 mt-10 text-3xl font-bold text-blue-600 m-auto text-center">
-        Slot Booking
-      </h1>
-      <div className="flex flex-col md:flex-row mx-auto items-center justify-center">
-        <Calendar
-          className="border-2 border-gray-300 p-4 rounded-md mb-4 md:mb-0 md:mr-4"
-          onChange={handleDateChange}
-          value={selectedDate}
-        />
-        <div className="p-8">
-          {selectedDate && (
-            <>
-              <p className="mb-4 text-lg font-semibold text-gray-800">
-                Select a time slot:
-              </p>
-              <div className="grid grid-cols-4 gap-4 w-full md:w-400 mx-auto">
-                {timeSlots.map(({ time, isUnavailable }) => (
-                  <div key={time.toISOString()}>
-                    <button
-                      className={`w-full p-2 text-center rounded ${
-                        isUnavailable
-                          ? "bg-gray-300 text-gray-700 cursor-not-allowed"
-                          : bookedSlots.some(
-                              (bookedTime) =>
-                                bookedTime.getTime() === time.getTime()
-                            )
-                          ? "bg-gray-300 text-white cursor-not-allowed"
-                          : selectedTime === time
-                          ? "bg-teal-500 text-white"
-                          : "bg-blue-500 text-white"
-                      }`}
-                      onClick={() => handleTimeClick(time)}
-                      disabled={
-                        isUnavailable ||
-                        bookedSlots.some(
-                          (bookedTime) =>
-                            bookedTime.getTime() === time.getTime()
-                        )
-                      }
-                    >
-                      {time.toLocaleString("en-US", {
-                        hour: "numeric",
-                        minute: "numeric",
-                        hour12: true,
-                      })}
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
-          <div className="mt-8 text-center">
-            <p className="text-xl font-semibold mb-2">
-              Selected Date:{" "}
-              <span className="text-blue-500">
-                {selectedDate
-                  ? selectedDate.toLocaleDateString("en-US")
-                  : "None"}
-              </span>
-            </p>
-            <p className="text-xl font-semibold mb-4">
-              Selected Time:{" "}
-              <span className="text-green-500">
-                {selectedTime ? selectedTime.toLocaleString() : "None"}
-              </span>
-            </p>
+      <div className="box">
+        <div className="mb-8 mt-10 text-3xl font-bold text-blue-600 m-auto text-center">
+          Check Available Slots :-
+        </div>
+        <div className=" flex justify-center items-center gap-4 m-auto mt-[50px] p-0 h-550">
+          <div className="p-4">
+            <div className="mx-auto gap-30 text-23 font-bold text-center text-rgb-65-65-27 mb-30">
+              {value.toDateString().split(" ")[2]}-
+              {value.toDateString().split(" ")[1]}-
+              {value.toDateString().split(" ")[3]}
+            </div>
+            <Calendar
+              onChange={onChange}
+              value={value}
+              className="border-2 border-gray-300 p-4 rounded-md mb-4 md:mb-0 md:mr-4"
+            />
           </div>
 
-          {dayDetail && dayDetail.startHour === 0 ? (
-            <p className="text-lg mt-4 text-red-500">
-              Hey, it's a holiday! No slots available on Sundays.
-            </p>
-          ) : (
-            <button
-              className="bg-green-500 mt-4 py-2 px-4 text-white rounded hover:bg-green-600 focus:outline-none"
-              onClick={() => alert("Your Slot Booking Confirmed")}
-            >
-              Book
-            </button>
-          )}
+          <div className="box">
+            <div className="text-center pb-6 text-lg font-semibold text-gray-800">
+              Time Slots :-
+            </div>
+
+            <div className="grid grid-cols-4 gap-4 w-full md:w-400 mx-auto">
+              {renderDayContent()}
+            </div>
+          </div>
         </div>
       </div>
     </>

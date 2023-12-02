@@ -1,0 +1,49 @@
+.calender_parent {
+    width: 50%;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin: auto;
+    margin-top: 50px;
+    padding: 0px;
+    height: 550px;
+}
+
+.calender_parent>div {
+    margin: auto;
+    padding: 10px;
+}
+
+.time_slot {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.time_slot>div {
+    border: 1px solid green;
+    padding: 10px;
+    background-color: purple;
+    color: white;
+    border-radius: 5px;
+}
+
+.calender_heading {
+    margin: auto;
+    margin-top: 2%;
+    gap: 30px;
+    font-size: 30px;
+    font-weight: 900;
+    text-align: center;
+    color: rgb(65, 65, 27);
+}
+
+.calender_heading1 {
+    margin: auto;
+    gap: 30px;
+    font-size: 23px;
+    font-weight: 700;
+    text-align: center;
+    color: rgb(65, 65, 27);
+    margin-bottom: 30px;
+}
